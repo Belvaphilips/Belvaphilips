@@ -70,20 +70,20 @@ export default function SigninComponent() {
     }
   };
 
-  const logout = async () => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error("Error logging out:", error.message);
-        return;
-      }
-      console.log("User logged out successfully");
-      dispatch(clearUser());
-      cookies.remove("user_token", { path: "/" });
-    } catch (err) {
-      console.error("Unexpected error during logout:", err);
-    }
-  };
+  // const logout = async () => {
+  //   try {
+  //     const { error } = await supabase.auth.signOut();
+  //     if (error) {
+  //       console.error("Error logging out:", error.message);
+  //       return;
+  //     }
+  //     console.log("User logged out successfully");
+  //     dispatch(clearUser());
+  //     cookies.remove("user_token", { path: "/" });
+  //   } catch (err) {
+  //     console.error("Unexpected error during logout:", err);
+  //   }
+  // };
 
   return (
     <>
