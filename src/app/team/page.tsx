@@ -82,51 +82,7 @@ const teamMembers = [
     image: "/assets/team/mary.png",
     imagePosition: "right" as const,
   },
-  // {
-  //   name: "ADEBUNMI AKINTUNDE",
-  //   title: "OPERATIONS MANAGER",
 
-  //   bio: [
-  //     <span>
-  //       Adebunmi Akintunde is an Operations Executive at Belvaphilips. She
-  //       joined the team in 2024 and has been involved in various operational
-  //       tasks and adherence to non-disclosure agreements. Adebunmi has a
-  //       background in Community Management, Graphics design, Business Analyst
-  //       and Facility Management. She holds a Bachelor of Arts in English
-  //       Language, obtained in 2019 from Obafemi Awolowo university ile-ife.
-  //       Adebunmi resides in Lagos and has a strong professional background with
-  //       experience in organizing events, creating communication campaigns, brand
-  //       and client management.
-  //     </span>,
-  //   ],
-  //   image: "/assets/team/bunmi.png",
-  //   imagePosition: "left" as const,
-  // },
-  // {
-  //   name: "AKOREDE OLANREWAJU HADIRR",
-  //   title: "ART DIRECTOR",
-
-  //   bio: [
-  //     <span>
-  //       My name is Akorede Olanrewaju, a certified paper artist, Graphics
-  //       designer and Art director. My life has been Paper, Pencil, Pen and
-  //       Graphics with passion, creativity, and an unyielding love for art. From
-  //       an early age, I found solace in the world of colors, shapes, and
-  //       designs. Over the years, I have been able to build amazing sets,
-  //       creatives, and craftsmen, bridging the gap between digital and tangible
-  //       artistry. My projects often involve a fusion of handcrafted elements
-  //       with modern design techniques, creating immersive and visually striking
-  //       experiences. <br />
-  //       Art is ever-evolving, and so is my journey. I continue to challenge
-  //       myself, exploring new materials, techniques, and creative expressions.
-  //       Whether through my role as an Art Director, a craftsman, or a mentor, I
-  //       remain committed to making art that not only captivates but also
-  //       inspires.
-  //     </span>,
-  //   ],
-  //   image: "/assets/team/korede.png",
-  //   imagePosition: "right" as const,
-  // },
   {
     name: "MARC DIKO",
     title: "VIDEOGRAPHER",
@@ -192,7 +148,6 @@ const teamMembers = [
 export default function TeamSection() {
   return (
     <>
-      <Header />
       <section className="md:pt-[100px] pt-9">
         <div className="container mx-auto px-4 py-16">
           <motion.h2
