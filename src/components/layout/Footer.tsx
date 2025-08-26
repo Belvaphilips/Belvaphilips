@@ -44,19 +44,6 @@ const Footer = () => {
                 </p>
               </div>
               <div className="flex flex-col gap-3">
-                {/* <div className="flex gap-2">
-                  <span>
-                    <Image
-                      src="/assets/images/Phone.svg"
-                      width={22}
-                      height={22}
-                      alt="Phone"
-                    />
-                  </span>
-                  <p className="md:text-lg text-base font-medium">
-                    08156744356
-                  </p>
-                </div> */}
                 <div className="flex gap-2">
                   <span>
                     <Image
@@ -255,7 +242,10 @@ const Footer = () => {
                     </Link>
                   </li>
                   <li>
-                    <Link href="/pricing" className="hover:underline">
+                    <Link
+                      href="/pricing#membership-section"
+                      className="hover:underline"
+                    >
                       Membership
                     </Link>
                   </li>
@@ -282,7 +272,10 @@ const Footer = () => {
                     </Link>
                   </li>
                   <li>
-                    <Link href="/pricing" className="hover:underline">
+                    <Link
+                      href="/pricing#membership-section"
+                      className="hover:underline"
+                    >
                       Membership
                     </Link>
                   </li>
