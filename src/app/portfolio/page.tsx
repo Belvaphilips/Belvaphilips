@@ -8,7 +8,6 @@ import Footer from "@/components/layout/Footer";
 export default function Portfolio() {
   return (
     <>
-      <Header />
       <Suspense
         fallback={
           <div className="min-h-screen bg-white flex items-center justify-center">

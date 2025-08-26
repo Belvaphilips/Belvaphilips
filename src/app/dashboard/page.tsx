@@ -65,7 +65,6 @@ const UserDashboard: React.FC = () => {
 
   return (
     <>
-      <Header />
       <div className="container mx-auto sm:pt-[140px] py-[120px] px-4">
         <div>
           <DashboardHeader />

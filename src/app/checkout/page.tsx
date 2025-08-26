@@ -149,7 +149,6 @@ const CheckoutPage = () => {
   if (isLoading) {
     return (
       <>
-        <Header />
         <div className="min-h-screen flex justify-center items-center">
           <p>Loading checkout...</p>
         </div>
@@ -160,7 +159,6 @@ const CheckoutPage = () => {
 
   return (
     <>
-      <Header />
       <div className="pt-[60px] bg-[#F5F5F5] min-h-screen">
         <div className="container mx-auto px-4 py-16">
           {/* Breadcrumb */}

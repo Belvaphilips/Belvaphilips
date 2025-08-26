@@ -14,14 +14,13 @@ import {
 } from "../ui/hover-card";
 
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
-import { clearUser } from "@/lib/redux/slices/userSlice";
+import { clearUser, setUser } from "@/lib/redux/slices/userSlice";
 import { createClient } from "@/lib/supabase/client";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isUserAuthenticated, setIsUserAuthenticated] = useState(false);
-  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
   const { userId, email } = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
   const cookies = new Cookies();
@@ -30,40 +29,86 @@ const Header = () => {
 
   const specialPaths = ["/team", "/blog", "/contact"];
 
+  const hiddenHeaderPaths = ["/signin", "/auth", "auth/callback", "/otp"];
+
+  const shouldHideHeader = hiddenHeaderPaths.some(
+    (path) => pathname === path || pathname.startsWith(path + "/")
+  );
+
   const supabase = createClient();
 
-  const checkAuth = async () => {
-    const {
-      data: { user },
-      error,
-    } = await supabase.auth.getUser();
+  const checkAuthAndUpdateStore = async (showLoading = true) => {
+    try {
+      if (showLoading) {
+        setAuthLoading(true);
+      }
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser();
 
-    setIsUserAuthenticated(!!user);
-    setUserEmail(user?.email || null);
+      console.log("Header: Auth check result:", { user: !!user, error });
+
+      if (user && !error) {
+        dispatch(
+          setUser({
+            userId: user.id,
+            email: user.email || "",
+          })
+        );
+      } else {
+        dispatch(clearUser());
+      }
+    } catch (err) {
+      console.error("Header: Error checking auth:", err);
+      dispatch(clearUser());
+    } finally {
+      if (showLoading) {
+        setAuthLoading(false);
+      }
+    }
   };
 
   useEffect(() => {
-    checkAuth();
+    checkAuthAndUpdateStore();
+    if (!userId) {
+      checkAuthAndUpdateStore();
+    }
 
-    const { data: authListener } = supabase.auth.onAuthStateChange(() => {
-      checkAuth();
-    });
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (event === "SIGNED_IN" && session?.user) {
+          dispatch(
+            setUser({
+              userId: session.user.id,
+              email: session.user.email || "",
+            })
+          );
+          setAuthLoading(false);
+        } else if (event === "SIGNED_OUT" || !session) {
+          dispatch(clearUser());
+          setAuthLoading(false);
+        }
+      }
+    );
 
     return () => {
       authListener.subscription.unsubscribe();
     };
-  }, []);
-
-  useEffect(() => {
-    console.log("Header: Pathname changed, re-checking auth");
-    checkAuth();
-  }, [pathname]);
+  }, [dispatch, supabase, userId]);
 
   const handleUserLogout = async () => {
-    await supabase.auth.signOut();
-    setIsUserAuthenticated(false);
-    setUserEmail(null);
-    router.push("/signin");
+    try {
+      setAuthLoading(true);
+      await supabase.auth.signOut();
+      dispatch(clearUser());
+      cookies.remove("user_token", { path: "/" });
+      router.push("/signin");
+    } catch (err) {
+      console.error("Header: Error during logout:", err);
+    } finally {
+      setAuthLoading(false);
+    }
   };
 
   const routeToDashboard = () => {
@@ -72,19 +117,88 @@ const Header = () => {
   };
 
   const logout = async () => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error("Error logging out:", error.message);
-        return;
-      }
-      console.log("User logged out successfully");
-      dispatch(clearUser());
-      cookies.remove("user_token", { path: "/" });
-    } catch (err) {
-      console.error("Unexpected error during logout:", err);
-    }
+    await handleUserLogout();
   };
+
+  const renderAuthSection = () => {
+    if (authLoading) {
+      return (
+        <div className="w-[84px] h-[40px] flex items-center justify-center rounded-full bg-gray-200 animate-pulse">
+          <div className="w-4 h-4 bg-gray-300 rounded"></div>
+        </div>
+      );
+    }
+
+    if (userId) {
+      // User is authenticated
+      return (
+        <HoverCard openDelay={0} closeDelay={200}>
+          <HoverCardTrigger asChild>
+            <Link href={"/dashboard"}>
+              <button className="w-[38px] h-[38px] flex items-center justify-center rounded-full bg-[#EBEBEB] cursor-pointer">
+                <Image
+                  src={"/assets/images/user-avatar.svg"}
+                  width={19.5}
+                  height={19.5}
+                  alt="Profile"
+                />
+              </button>
+            </Link>
+          </HoverCardTrigger>
+          <HoverCardContent
+            className="!max-w-[200px] space-y-2"
+            side="bottom"
+            align="center"
+          >
+            <div className="text-sm text-gray-600 flex items-center truncate">
+              {email}
+            </div>
+            <button
+              onClick={logout}
+              className="flex items-center text-sm gap-1 cursor-pointer"
+            >
+              Logout
+              <span>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M10 11.75C9.95093 12.9846 8.92207 14.0329 7.54373 13.9992C7.22307 13.9913 6.82673 13.8796 6.03408 13.656C4.12641 13.1179 2.47037 12.2135 2.07304 10.1877C2 9.81533 2 9.39627 2 8.5582V7.4418C2 6.60374 2 6.1847 2.07304 5.81231C2.47037 3.78643 4.12641 2.8821 6.03408 2.34402C6.82673 2.12042 7.22307 2.00863 7.54373 2.00079C8.92207 1.96707 9.95093 3.01538 10 4.25"
+                    stroke="#C23B3B"
+                    strokeLinecap="round"
+                  />
+                  <path
+                    d="M14 8.00016H6.66663M14 8.00016C14 7.53336 12.6704 6.66118 12.3333 6.3335M14 8.00016C14 8.46696 12.6704 9.33916 12.3333 9.66683"
+                    stroke="#C23B3B"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </span>
+            </button>
+          </HoverCardContent>
+        </HoverCard>
+      );
+    }
+
+    // User is not authenticated
+    return (
+      <Link
+        href="/signin"
+        className="rounded-full font-medium text-sm uppercase w-[84px] h-[40px] flex items-center justify-center text-[#1D1D1B] bg-[#EBEBEB]"
+      >
+        log in
+      </Link>
+    );
+  };
+
+  if (shouldHideHeader) {
+    return null;
+  }
 
   return (
     <header className="w-full bg-white fixed left-0 right-0 z-[20] lg:py-[30.63px] py-6 lg:border-b lg:border-[#E0E0E0] max-w-[1800px] mx-auto">
@@ -121,7 +235,7 @@ const Header = () => {
           <span
             className={`font-logo text-[17.92px] flex items-center gap-[2.45px]`}
           >
-            <span className={`font-black  `}>BELVAPHILIPS</span>
+            <span className={`font-black`}>BELVAPHILIPS</span>
             <span className="font-light ">IMAGERY</span>
           </span>
         </Link>
@@ -265,65 +379,7 @@ const Header = () => {
 
         {/* Auth Buttons */}
         <div className="hidden lg:flex space-x-3 items-center">
-          {userId ? (
-            <HoverCard openDelay={0} closeDelay={200}>
-              <HoverCardTrigger asChild>
-                <Link href={"/dashboard"}>
-                  <button className="w-[38px] h-[38px] flex items-center justify-center rounded-full bg-[#EBEBEB] cursor-pointer">
-                    <Image
-                      src={"/assets/images/user-avatar.svg"}
-                      width={19.5}
-                      height={19.5}
-                      alt="Profile"
-                    />
-                  </button>
-                </Link>
-              </HoverCardTrigger>
-              <HoverCardContent
-                className="!max-w-[200px] space-y-2"
-                side="bottom"
-                align="center"
-              >
-                <div className="text-sm text-gray-600  flex items-center truncate">
-                  {email}
-                </div>
-                <button
-                  onClick={logout}
-                  className="flex items-center text-sm gap-1 cursor-pointer"
-                >
-                  Logout
-                  <span>
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M10 11.75C9.95093 12.9846 8.92207 14.0329 7.54373 13.9992C7.22307 13.9913 6.82673 13.8796 6.03408 13.656C4.12641 13.1179 2.47037 12.2135 2.07304 10.1877C2 9.81533 2 9.39627 2 8.5582V7.4418C2 6.60374 2 6.1847 2.07304 5.81231C2.47037 3.78643 4.12641 2.8821 6.03408 2.34402C6.82673 2.12042 7.22307 2.00863 7.54373 2.00079C8.92207 1.96707 9.95093 3.01538 10 4.25"
-                        stroke="#C23B3B"
-                        strokeLinecap="round"
-                      />
-                      <path
-                        d="M14 8.00016H6.66663M14 8.00016C14 7.53336 12.6704 6.66118 12.3333 6.3335M14 8.00016C14 8.46696 12.6704 9.33916 12.3333 9.66683"
-                        stroke="#C23B3B"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </span>
-                </button>
-              </HoverCardContent>
-            </HoverCard>
-          ) : (
-            <Link
-              href="/signin"
-              className=" rounded-full font-medium text-sm uppercase w-[84px] h-[40px] flex items-center justify-center text-[#1D1D1B] bg-[#EBEBEB]"
-            >
-              log in
-            </Link>
-          )}
+          {renderAuthSection()}
 
           <button
             onClick={() => setIsModalOpen(true)}
@@ -332,45 +388,6 @@ const Header = () => {
             GET STARTED
           </button>
         </div>
-
-        {/* <div className="hidden md:flex space-x-3 items-center">
-          {userId ? (
-            <div className="flex items-center gap-1">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-5 h-5 text-gray-600"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.964 0a9 9 0 10-11.964 0m11.964 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"
-                />
-              </svg>
-              <span className="text-sm text-gray-600 truncate max-w-[120px]">
-                {email}
-              </span>
-              <button
-                onClick={handleUserLogout}
-                className="w-[84px] h-[38px] flex items-center justify-center rounded-full bg-[#EBEBEB] uppercase text-sm font-medium"
-              >
-                Logout
-              </button>
-            </div>
-          ) : (
-            <Link
-              href="/signin"
-              className="w-[84px] h-[38px] flex items-center justify-center rounded-full bg-[#EBEBEB] uppercase text-sm font-medium"
-            >
-              LOGIN
-            </Link>
-          )}
-
-         
-        </div> */}
 
         {/* Mobile Menu Button */}
         <button
@@ -465,17 +482,21 @@ const Header = () => {
               Contact
             </Link>
             <div className="flex flex-col space-y-3">
-              {isUserAuthenticated ? (
+              {authLoading ? (
+                <div className="w-full h-[40px] flex items-center justify-center rounded-full bg-gray-200 animate-pulse">
+                  <div className="w-4 h-4 bg-gray-300 rounded"></div>
+                </div>
+              ) : userId ? (
                 <button
                   onClick={routeToDashboard}
-                  className=" rounded-full font-medium text-sm uppercase w-full h-[40px] flex items-center justify-center text-[#1D1D1B] bg-[#EBEBEB]"
+                  className="rounded-full font-medium text-sm uppercase w-full h-[40px] flex items-center justify-center text-[#1D1D1B] bg-[#EBEBEB]"
                 >
                   My Profile
                 </button>
               ) : (
                 <Link
                   href="/signin"
-                  className=" rounded-full font-medium text-sm uppercase w-full h-[40px] flex items-center justify-center text-[#1D1D1B] bg-[#EBEBEB]"
+                  className="rounded-full font-medium text-sm uppercase w-full h-[40px] flex items-center justify-center text-[#1D1D1B] bg-[#EBEBEB]"
                 >
                   sign up
                 </Link>
@@ -485,7 +506,7 @@ const Header = () => {
                   setIsMenuOpen(false);
                   setIsModalOpen(true);
                 }}
-                className=" bg-[#1D1D1B] text-white rounded-full uppercase w-full h-[40px] flex items-center justify-center text-sm font-semibold"
+                className="bg-[#1D1D1B] text-white rounded-full uppercase w-full h-[40px] flex items-center justify-center text-sm font-semibold"
               >
                 GET STARTED
               </button>

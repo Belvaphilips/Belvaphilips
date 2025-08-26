@@ -135,7 +135,6 @@ const HowItWorksPage = () => {
 
   return (
     <>
-      <Header />
       <div className="md:pt-[100px] bg-white pt-9" ref={ref}>
         <div className="container mx-auto px-4 pt-16 pb-20">
           <motion.h1

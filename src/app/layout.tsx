@@ -5,6 +5,8 @@ import RootLayoutClient from "./RootLayoutClient";
 import "./globals.css";
 import Head from "next/head";
 
+import Header from "@/components/layout/Header";
+
 const inter = Inter({
   subsets: ["latin"],
 });
@@ -64,6 +66,7 @@ export default function RootLayoutServer({
             content="uynsFH9sN28k9U4E1kmQ--cCkUvIH_PN_ouHwBTl3Ew"
           />
         </Head>
+
         <RootLayoutClient>{children}</RootLayoutClient>
       </body>
     </html>

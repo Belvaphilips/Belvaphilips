@@ -7,7 +7,6 @@ import { Suspense } from "react";
 export default function FinalizePage() {
   return (
     <>
-      <Header />
       <Suspense
         fallback={
           <div className="min-h-screen bg-white flex items-center justify-center">
