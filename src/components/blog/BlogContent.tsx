@@ -1,7 +1,6 @@
 "use client";
 import { AnimatePresence, motion } from "framer-motion";
 import { getAllPosts } from "@/lib/api";
-// import BlogCard from "./BlogCard";
 import { useEffect, useState } from "react";
 import Spinner from "../ui/Spinner";
 import PostCard from "./PostCard";
@@ -18,36 +17,50 @@ interface Post {
   id: string;
 }
 
+interface ApiResponse {
+  data: {
+    posts: Post[];
+    total: number;
+  };
+}
+
 export default function BlogContent() {
   const [posts, setPublishedPosts] = useState<Post[]>([]);
   const [isFetchingPosts, setIsFetchingPosts] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPosts, setTotalPosts] = useState(0);
   const postsPerPage = 10;
 
-  useEffect(() => {
-    const fetchPublishedPosts = async () => {
-      setIsFetchingPosts(true);
-      try {
-        const { data } = await getAllPosts(1, postsPerPage);
-        if (data) {
-          setPublishedPosts(data.data.posts);
+  const totalPages = Math.max(1, Math.ceil(totalPosts / postsPerPage));
+
+  const fetchPublishedPosts = async (page: number) => {
+    setIsFetchingPosts(true);
+    try {
+      const { data }: { data: ApiResponse } = await getAllPosts(
+        page,
+        postsPerPage
+      );
+      if (data) {
+        setPublishedPosts(data.data.posts);
+
+        if (page === 1) {
+          setTotalPosts(data.data.total);
         }
-      } catch (e) {
-        console.log("Error fetching published posts:", e);
-      } finally {
-        setIsFetchingPosts(false);
       }
-    };
-    fetchPublishedPosts();
-  }, []);
+    } catch (e) {
+      console.log("Error fetching published posts:", e);
+    } finally {
+      setIsFetchingPosts(false);
+    }
+  };
 
-  const currentPosts = posts;
-  const totalPages = Math.ceil(currentPosts.length / postsPerPage);
+  useEffect(() => {
+    fetchPublishedPosts(currentPage);
+  }, [currentPage]);
 
-  const paginatedPosts = currentPosts.slice(
-    (currentPage - 1) * postsPerPage,
-    currentPage * postsPerPage
-  );
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   if (isFetchingPosts) {
     return (
@@ -70,7 +83,7 @@ export default function BlogContent() {
         </motion.h1>
         <motion.div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           <AnimatePresence mode="wait">
-            {paginatedPosts.map((post, index) => (
+            {posts.map((post, index) => (
               <PostCard post={post} key={post.id} index={index} />
             ))}
           </AnimatePresence>
@@ -78,7 +91,7 @@ export default function BlogContent() {
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
-          onPageChange={setCurrentPage}
+          onPageChange={handlePageChange}
         />
       </div>
     </div>

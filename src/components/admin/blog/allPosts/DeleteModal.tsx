@@ -17,8 +17,7 @@ const DeleteModal: React.FC<{
   date: string;
   postId: string;
   postType: string;
-  publishedPosts: () => Promise<void>;
-  draftPosts: () => Promise<void>;
+
   isDeleting: boolean;
 }> = ({
   isOpen,
@@ -28,7 +27,7 @@ const DeleteModal: React.FC<{
   date,
   postId,
   postType,
-  publishedPosts,
+
   isDeleting,
 }) => {
   return (

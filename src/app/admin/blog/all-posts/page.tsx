@@ -31,6 +31,8 @@ const AllPostsPage: React.FC = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isFetchingPosts, setIsFetchingPosts] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [totalPosts, setTotalPosts] = useState(0);
+  const [totalDrafts, setTotalDrafts] = useState(0);
   const [postToDelete, setPostToDelete] = useState<{
     id: string;
     title: string;
@@ -41,12 +43,16 @@ const AllPostsPage: React.FC = () => {
 
   const postsPerPage = 10;
 
-  const fetchPublishedPosts = async () => {
+  const fetchPublishedPosts = async (page: number) => {
     setIsFetchingPosts(true);
     try {
-      const { data } = await getAllPosts(1, postsPerPage);
+      const { data } = await getAllPosts(page, postsPerPage);
       if (data) {
         setPublishedPosts(data.data.posts);
+
+        if (page === 1) {
+          setTotalPosts(data.data.total);
+        }
       }
     } catch (e) {
       console.log("Error fetching published posts:", e);
@@ -55,7 +61,7 @@ const AllPostsPage: React.FC = () => {
     }
   };
 
-  const fetchDrafts = async () => {
+  const fetchDrafts = async (page: number) => {
     setIsFetchingPosts(true);
     const token = cookies.get("admin_token");
 
@@ -63,9 +69,13 @@ const AllPostsPage: React.FC = () => {
       setAuthToken(token);
     }
     try {
-      const { data } = await getAllDrafts(1, postsPerPage);
+      const { data } = await getAllDrafts(page, postsPerPage);
       if (data) {
         setDraftPosts(data.data.posts);
+
+        if (page === 1) {
+          setTotalDrafts(data.data.total);
+        }
       }
     } catch (e) {
       console.log("Error fetching drafts:", e);
@@ -76,20 +86,20 @@ const AllPostsPage: React.FC = () => {
 
   useEffect(() => {
     if (activeTab === "posts") {
-      fetchPublishedPosts();
+      fetchPublishedPosts(currentPage);
     } else {
-      fetchDrafts();
+      fetchDrafts(currentPage);
     }
-  }, []);
+  }, [currentPage]);
 
   const handleTabChange = (tab: any) => {
     setActiveTab(tab);
     setCurrentPage(1);
 
-    if (tab === "posts" && publishedPosts.length === 0) {
-      fetchPublishedPosts();
-    } else if (tab === "drafts" && draftPosts.length === 0) {
-      fetchDrafts();
+    if (tab === "posts") {
+      fetchPublishedPosts(1);
+    } else {
+      fetchDrafts(1);
     }
   };
 
@@ -97,13 +107,14 @@ const AllPostsPage: React.FC = () => {
     return activeTab === "posts" ? publishedPosts : draftPosts;
   };
 
-  const currentPosts = getCurrentPosts();
-  const totalPages = Math.ceil(currentPosts.length / postsPerPage);
+  const getCurrentTotal = () => {
+    return activeTab === "posts" ? totalPosts : totalDrafts;
+  };
 
-  const paginatedPosts = currentPosts.slice(
-    (currentPage - 1) * postsPerPage,
-    currentPage * postsPerPage
-  );
+  const currentPosts = getCurrentPosts();
+  const totalPages = Math.max(1, Math.ceil(getCurrentTotal() / postsPerPage));
+
+  const displayPosts = currentPosts;
 
   const handleEdit = (id: string) => {
     router.push(`/admin/blog/post/${id}`);
@@ -140,25 +151,23 @@ const AllPostsPage: React.FC = () => {
       });
 
       if (activeTab === "posts") {
-        setPublishedPosts((prev) =>
-          prev.filter((post) => post.id !== postToDelete.id)
-        );
-        fetchPublishedPosts();
+        fetchPublishedPosts(currentPage);
       } else {
-        setDraftPosts((prev) =>
-          prev.filter((post) => post.id !== postToDelete.id)
-        );
-        setIsDeleteModalOpen(false);
-        fetchDrafts();
+        fetchDrafts(currentPage);
       }
 
       setPostToDelete(null);
+      setIsDeleteModalOpen(false);
     } catch (error) {
       console.error("Failed to delete post:", error);
       toast.error("Failed to delete post.");
     } finally {
       setIsDeleting(false);
     }
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
   };
 
   if (isFetchingPosts) {
@@ -180,7 +189,7 @@ const AllPostsPage: React.FC = () => {
       ) : (
         <>
           <div className="grid md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-5">
-            {paginatedPosts.map((post) => (
+            {displayPosts.map((post) => (
               <PostCard
                 key={post.id}
                 post={post}
@@ -193,7 +202,7 @@ const AllPostsPage: React.FC = () => {
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
-              onPageChange={setCurrentPage}
+              onPageChange={handlePageChange}
             />
           </div>
         </>
@@ -208,8 +217,6 @@ const AllPostsPage: React.FC = () => {
           date={postToDelete.created_at}
           postId={postToDelete.id}
           postType={activeTab === "posts" ? "published" : "draft"}
-          publishedPosts={fetchPublishedPosts}
-          draftPosts={fetchDrafts}
           isDeleting={isDeleting}
         />
       )}
