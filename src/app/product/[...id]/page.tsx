@@ -32,7 +32,6 @@ export default function ProductServicePage() {
 
   return (
     <>
-      <Header />
       <ProductConfigurationPage category={category} shootType={shootType} />
       <Footer />
     </>
