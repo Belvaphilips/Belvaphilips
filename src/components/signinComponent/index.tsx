@@ -12,7 +12,11 @@ const getBaseUrl = () => {
     return process.env.NEXT_PUBLIC_SITE_URL;
   }
 
-  return window.location.origin;
+  if (typeof window !== "undefined") {
+    return window.location.origin;
+  }
+
+  return "http://localhost:3000";
 };
 
 export default function SigninComponent() {
@@ -58,6 +62,10 @@ export default function SigninComponent() {
           redirectTo: `${baseUrl}/auth/callback${
             next ? `?next=${encodeURIComponent(next)}` : ""
           }`,
+          queryParams: {
+            access_type: "offline",
+            prompt: "consent",
+          },
         },
       });
 
@@ -69,21 +77,6 @@ export default function SigninComponent() {
       setIsSigningIn(false);
     }
   };
-
-  // const logout = async () => {
-  //   try {
-  //     const { error } = await supabase.auth.signOut();
-  //     if (error) {
-  //       console.error("Error logging out:", error.message);
-  //       return;
-  //     }
-  //     console.log("User logged out successfully");
-  //     dispatch(clearUser());
-  //     cookies.remove("user_token", { path: "/" });
-  //   } catch (err) {
-  //     console.error("Unexpected error during logout:", err);
-  //   }
-  // };
 
   return (
     <>

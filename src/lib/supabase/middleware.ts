@@ -38,31 +38,33 @@ export async function updateSession(request: NextRequest) {
     !request.nextUrl.pathname.startsWith("/signin") &&
     !request.nextUrl.pathname.startsWith("/auth")
   ) {
-    // no user, potentially respond by redirecting the user to the signin page
     const url = request.nextUrl.clone();
     url.pathname = "/signin";
-    url.searchParams.set("next", request.nextUrl.pathname);
+
+    const currentPath = request.nextUrl.pathname;
+    const currentSearch = request.nextUrl.search;
+    const fullCurrentPath = currentPath + currentSearch;
+
+    url.searchParams.set("next", fullCurrentPath);
+
     return NextResponse.redirect(url);
   }
 
-  // Redirect authenticated users attempting to access the sign-in page
   if (user && request.nextUrl.pathname.startsWith("/signin")) {
-    const url = request.nextUrl.clone();
-
-    // Check if there's a 'next' parameter
     const nextParam = request.nextUrl.searchParams.get("next");
 
     if (nextParam) {
-      url.pathname = nextParam;
-      url.search = "";
-    } else {
-      console.log(
-        `Supabase middleware: Redirecting authenticated user to home`
-      );
-      url.pathname = "/";
+      const isValidRedirect =
+        nextParam.startsWith("/") && !nextParam.startsWith("//");
+
+      if (isValidRedirect) {
+        const redirectUrl = new URL(nextParam, request.url);
+        return NextResponse.redirect(redirectUrl);
+      }
     }
 
-    return NextResponse.redirect(url);
+    const homeUrl = new URL("/", request.url);
+    return NextResponse.redirect(homeUrl);
   }
 
   return supabaseResponse;

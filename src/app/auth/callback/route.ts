@@ -7,6 +7,13 @@ export async function GET(request: Request) {
   const code = searchParams.get("code");
   const next = searchParams.get("next") ?? "/";
 
+  console.log("=== AUTH CALLBACK DEBUG (Production) ===");
+  console.log("Full URL:", request.url);
+  console.log("Code:", code ? "present" : "missing");
+  console.log("Next parameter:", next);
+  console.log("Origin:", origin);
+  console.log("All search params:", Object.fromEntries(searchParams.entries()));
+
   if (code) {
     const supabase = await createClient();
     const {
@@ -15,14 +22,23 @@ export async function GET(request: Request) {
     } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error && session?.user) {
-      console.log("Authentication successful for user:", session.user.id);
+      const isValidRedirect = next.startsWith("/") && !next.startsWith("//");
 
-      // redirect to the next page or home page
-      return NextResponse.redirect(`${origin}${next}`);
+      if (isValidRedirect) {
+        const redirectUrl = `${origin}${next}`;
+
+        return NextResponse.redirect(redirectUrl);
+      } else {
+        return NextResponse.redirect(`${origin}/`);
+      }
     } else {
       console.error("Session exchange error:", error);
+      console.log("Redirecting to error page due to session exchange failure");
     }
+  } else {
+    console.log("No code parameter found in URL");
   }
 
+  console.log("Redirecting to auth error page");
   return NextResponse.redirect(`${origin}/auth/auth-code-error`);
 }
