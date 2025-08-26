@@ -156,7 +156,6 @@ export default function ShippingPolicy() {
 
   return (
     <>
-      <Header />
       <div className="bg-white md:pt-[100px] pt-11">
         <div className="container mx-auto px-4 py-16">
           <motion.h1
