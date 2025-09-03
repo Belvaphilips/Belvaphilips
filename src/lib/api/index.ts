@@ -126,8 +126,11 @@ export const getUserById = async (id: string | number) => {
 
 /** GALLERY */
 
-export const getAllGallery = async () => {
-  return httpService.get(getAllGalleryUrl);
+export const getAllGallery = async (
+  page: string | number,
+  limit: string | number
+) => {
+  return httpService.get(getAllGalleryUrl, { params: { page, limit } });
 };
 
 export const createGallery = async (data: any) => {

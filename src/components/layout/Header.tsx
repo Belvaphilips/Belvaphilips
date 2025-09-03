@@ -29,7 +29,13 @@ const Header = () => {
 
   const specialPaths = ["/team", "/blog", "/contact"];
 
-  const hiddenHeaderPaths = ["/signin", "/auth", "auth/callback", "/otp"];
+  const hiddenHeaderPaths = [
+    "/signin",
+    "/auth",
+    "auth/callback",
+    "/otp",
+    "/admin",
+  ];
 
   const shouldHideHeader = hiddenHeaderPaths.some(
     (path) => pathname === path || pathname.startsWith(path + "/")

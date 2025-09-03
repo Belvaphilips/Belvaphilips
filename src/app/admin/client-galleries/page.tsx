@@ -30,16 +30,6 @@ interface ClientGallery {
   total: number;
 }
 
-const sortedOrders = [
-  {
-    id: "1",
-    order_name: "Order #12345",
-    created_at: "2023-10-01T12:00:00Z",
-    updated_at: "2023-10-02T12:00:00Z",
-    status: "pending",
-  },
-];
-
 export default function ClientGalleries() {
   const [currentPage, setCurrentPage] = useState(1);
   const [allGalleries, setAllGalleries] = useState<Gallery[]>([]);
@@ -47,42 +37,55 @@ export default function ClientGalleries() {
   const [galleryToDelete, setGalleryToDelete] = useState<Gallery | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
-
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [totalGalleries, setTotalGalleries] = useState(0);
+
   const cookies = new Cookies();
+  const galleriesPerPage = 5;
+  const totalPages = Math.max(1, Math.ceil(totalGalleries / galleriesPerPage));
 
-  const ordersPerPage = 5;
+  const fetchGalleries = useCallback(
+    async (page: number) => {
+      setIsLoading(true);
 
-  const totalPages = Math.ceil(allGalleries.length / ordersPerPage);
-  const paginatedOrders = allGalleries?.slice(
-    (currentPage - 1) * ordersPerPage,
-    currentPage * ordersPerPage
+      const token = cookies.get("admin_token");
+      if (token) {
+        setAuthToken(token);
+      }
+
+      try {
+        const { data } = await getAllGallery(page, galleriesPerPage);
+        if (data) {
+          const sortedGalleries = data.data.galleries.sort(
+            (a: Gallery, b: Gallery) => {
+              const dateA = new Date(a.created_at);
+              const dateB = new Date(b.created_at);
+              return dateB.getTime() - dateA.getTime();
+            }
+          );
+
+          setAllGalleries(sortedGalleries);
+
+          if (page === 1) {
+            setTotalGalleries(data.data.total);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching galleries:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [cookies]
   );
 
-  const fetchGalleries = useCallback(async () => {
-    setIsLoading(true);
-
-    const token = cookies.get("admin_token");
-    if (token) {
-      setAuthToken(token);
-    }
-
-    try {
-      const { data } = await getAllGallery();
-      if (data) {
-        setAllGalleries(data.data.galleries);
-        console.log("Fetched Galleries:", data.data.galleries);
-      }
-    } catch (error) {
-      console.error("Error fetching galleries:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [getAllGallery, cookies, setAuthToken]);
-
   useEffect(() => {
-    fetchGalleries();
-  }, []);
+    fetchGalleries(currentPage);
+  }, [currentPage]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   const handleDeleteClick = (gallery: Gallery) => {
     setGalleryToDelete(gallery);
@@ -94,13 +97,11 @@ export default function ClientGalleries() {
       setIsDeleting(true);
       try {
         await deleteGallery(galleryToDelete.id);
-        setAllGalleries((prev) =>
-          prev.filter((gallery) => gallery.id !== galleryToDelete.id)
-        );
+
+        await fetchGalleries(currentPage);
+
         setGalleryToDelete(null);
         setShowDeleteModal(false);
-
-        await fetchGalleries();
       } catch (error) {
         console.error("Error deleting gallery:", error);
       } finally {
@@ -129,6 +130,7 @@ export default function ClientGalleries() {
           CLIENT GALLERIES
         </h1>
       </div>
+
       {/* Desktop View */}
       <div className="hidden md:block overflow-x-auto">
         <table className="min-w-[595px] divide-y divide-gray-200">
@@ -146,27 +148,27 @@ export default function ClientGalleries() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {paginatedOrders.length > 0 ? (
-              paginatedOrders.map((order) => (
-                <tr key={order.id}>
+            {allGalleries.length > 0 ? (
+              allGalleries.map((gallery) => (
+                <tr key={gallery.id}>
                   <td className="px-6 py-4 whitespace-nowrap text-base font-semibold text-[#1D1D1B]">
-                    {order.title}
+                    {gallery.title}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-base text-[#1D1D1B] font-semibold">
                     <span className="flex items-center gap-1">
                       <PiCalendarDots className="text-lg" />
-                      {formatDate(order.created_at)}
+                      {formatDate(gallery.created_at)}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-base text-gray-500 flex ">
                     <button
-                      onClick={() => setSelectedGallery(order)}
+                      onClick={() => setSelectedGallery(gallery)}
                       className="bg-black text-white px-4 py-2 rounded-full text-sm font-semibold uppercase cursor-pointer mr-3"
                     >
                       VIEW DETAILS
                     </button>
                     <button
-                      onClick={() => handleDeleteClick(order)}
+                      onClick={() => handleDeleteClick(gallery)}
                       className="w-[78px] h-[38px] flex items-center justify-center border border-[#E72E2E] cursor-pointer uppercase text-sm font-semibold text-[#E72E2E] rounded-full"
                     >
                       DELETE
@@ -177,7 +179,7 @@ export default function ClientGalleries() {
             ) : (
               <tr>
                 <td
-                  colSpan={4}
+                  colSpan={3}
                   className="px-6 py-4 text-center text-sm text-gray-500"
                 >
                   No galleries found
@@ -190,17 +192,17 @@ export default function ClientGalleries() {
 
       {/* Mobile View */}
       <div className="block md:hidden">
-        {paginatedOrders.length > 0 ? (
+        {allGalleries.length > 0 ? (
           <div className="space-y-10">
-            {paginatedOrders.map((order) => (
-              <div key={order.id} className="">
+            {allGalleries.map((gallery) => (
+              <div key={gallery.id} className="">
                 <div className="space-y-7">
                   <div>
                     <p className="text-xs font-medium text-[#787878] uppercase">
-                      REQUEST ID
+                      TITLE
                     </p>
                     <p className="text-base font-semibold text-[#1D1D1B]">
-                      {order.slug}
+                      {gallery.title}
                     </p>
                   </div>
 
@@ -210,7 +212,7 @@ export default function ClientGalleries() {
                     </p>
                     <p className="text-base font-semibold text-[#1D1D1B] flex items-center gap-1">
                       <PiCalendarDots className="text-lg" />
-                      {formatDate(order.created_at)}
+                      {formatDate(gallery.created_at)}
                     </p>
                   </div>
 
@@ -219,13 +221,13 @@ export default function ClientGalleries() {
                       ACTION
                     </p>
                     <button
-                      onClick={() => setSelectedGallery(order)}
+                      onClick={() => setSelectedGallery(gallery)}
                       className="mt-1 bg-black text-white px-4 py-2 rounded-full text-sm font-semibold uppercase cursor-pointer mb-3"
                     >
                       VIEW DETAILS
                     </button>
                     <button
-                      onClick={() => handleDeleteClick(order)}
+                      onClick={() => handleDeleteClick(gallery)}
                       className="w-[78px] h-[38px] flex items-center justify-center border border-[#E72E2E] cursor-pointer uppercase text-sm font-semibold text-[#E72E2E] rounded-full"
                     >
                       DELETE
@@ -241,11 +243,12 @@ export default function ClientGalleries() {
           </div>
         )}
       </div>
+
       <div className="flex justify-start">
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
-          onPageChange={setCurrentPage}
+          onPageChange={handlePageChange}
         />
       </div>
 
@@ -253,7 +256,7 @@ export default function ClientGalleries() {
         order={selectedGallery}
         isOpen={!!selectedGallery}
         onClose={() => setSelectedGallery(null)}
-        fetchGalleries={fetchGalleries}
+        fetchGalleries={() => fetchGalleries(currentPage)}
       />
 
       <GalleriesDeleteModal
