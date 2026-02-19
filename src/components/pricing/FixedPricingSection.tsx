@@ -6,7 +6,18 @@ import { useState } from "react";
 import GetStartedModal from "../getStartedModal";
 import { useRouter } from "next/navigation";
 
-const pricingOptions = [
+interface PricingOption {
+  title: string;
+  description: string;
+  image: string;
+  timeline: string;
+  price: string;
+  type: "basic" | "medium" | "high" | "premium";
+  format_type: string;
+  badge?: string;
+}
+
+const pricingOptions: PricingOption[] = [
   {
     title: "BASIC END FINISH",
     description:
@@ -17,27 +28,27 @@ const pricingOptions = [
     type: "basic" as const,
     format_type: "image",
   },
-  {
-    title: "MEDIUM END FINISH",
-    description:
-      "Styled product shots with colorful backdrops for a polished look.",
-    image: "/assets/pricing/medium-end.jpg",
-    timeline: "7-9 business days",
-    price: "₦44,000/image",
-    type: "medium" as const,
-    format_type: "image",
-  },
-  {
-    title: "MEDIUM END FINISH",
-    description:
-      "Styled product shots with colorful backdrops for a polished look.",
-    image: "/assets/pricing/medium-end2.jpg",
-    timeline: "7-9 business days",
-    price: "₦45,000/image",
-    type: "medium" as const,
-    badge: "Clothing",
-    format_type: "image",
-  },
+  // {
+  //   title: "MEDIUM END FINISH",
+  //   description:
+  //     "Styled product shots with colorful backdrops for a polished look.",
+  //   image: "/assets/pricing/medium-end.jpg",
+  //   timeline: "7-9 business days",
+  //   price: "₦44,000/image",
+  //   type: "medium" as const,
+  //   format_type: "image",
+  // },
+  // {
+  //   title: "MEDIUM END FINISH",
+  //   description:
+  //     "Styled product shots with colorful backdrops for a polished look.",
+  //   image: "/assets/pricing/medium-end2.jpg",
+  //   timeline: "7-9 business days",
+  //   price: "₦45,000/image",
+  //   type: "medium" as const,
+  //   badge: "Clothing",
+  //   format_type: "image",
+  // },
   {
     title: "HIGH END FINISH",
     description:
@@ -119,11 +130,6 @@ export default function FixedPricingSection() {
               onClick={() => handleClick(option)}
             />
           ))}
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 mdgap-6">
-        <div className="col-span-1">
           <PricingCard
             title={premiumOption.title}
             description={premiumOption.description}
@@ -135,8 +141,11 @@ export default function FixedPricingSection() {
             onClick={() => handleClick(premiumOption)}
           />
         </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 md:gap-6">
         <div className="col-span-3 md:flex items-center justify-center hidden">
-          <div className="relative w-full h-24">
+          <div className="relative w-full h-70">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full text-center">
                 <motion.div

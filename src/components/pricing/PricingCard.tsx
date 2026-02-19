@@ -8,7 +8,7 @@ interface PricingCardProps {
   image: string;
   timeline: string;
   price: string;
-  type?: "basic" | "premium" | "medium" | "high";
+  type?: "basic" | "premium" | "high" | "medium";
   format_type?: string;
   badge?: string;
   onClick?: () => void;
@@ -45,6 +45,7 @@ export default function PricingCard({
           />
         )}
       </div>
+
       <div className="md:p-5 p-3 border-t-[0.5px] border-[#C9C9C9] relative">
         {(badge === "premium" || badge === "Clothing") && (
           <div
