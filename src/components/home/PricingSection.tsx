@@ -12,11 +12,11 @@ const pricingOptions = [
     description: "From ₦25,000/image",
     image: "/assets/pricing/basic.png",
   },
-  {
-    title: "Medium End Finish",
-    description: "From ₦44,000/image",
-    image: "/assets/pricing/medium.png",
-  },
+  // {
+  //   title: "Medium End Finish",
+  //   description: "From ₦44,000/image",
+  //   image: "/assets/pricing/medium.png",
+  // },
   {
     title: "High End Finish",
     description: "From ₦65,000/image",

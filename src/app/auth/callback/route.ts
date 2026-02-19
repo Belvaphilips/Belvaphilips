@@ -7,13 +7,6 @@ export async function GET(request: Request) {
   const code = searchParams.get("code");
   const next = searchParams.get("next") ?? "/";
 
-  console.log("=== AUTH CALLBACK DEBUG (Production) ===");
-  console.log("Full URL:", request.url);
-  console.log("Code:", code ? "present" : "missing");
-  console.log("Next parameter:", next);
-  console.log("Origin:", origin);
-  console.log("All search params:", Object.fromEntries(searchParams.entries()));
-
   if (code) {
     const supabase = await createClient();
     const {

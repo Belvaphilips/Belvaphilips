@@ -263,7 +263,7 @@ const FAQSection = () => {
                         className="overflow-hidden bg-[#F9F9F9]"
                       >
                         <div className="p-7 pt-2">
-                          <div className="text-[#444444] md:text-lg md:text-lg text-sm">
+                          <div className="text-[#444444] md:text-lg text-sm">
                             {item.answer}
                           </div>
                         </div>

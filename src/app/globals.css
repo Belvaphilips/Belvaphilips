@@ -160,8 +160,6 @@ body {
     background: #555;
   }
 
-  /* Add these styles to your global CSS file or create a new CSS module */
-
   /* Base editor styles */
   .ProseMirror {
     min-height: 450px;
