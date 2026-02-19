@@ -329,11 +329,11 @@ const ShootTypeSelector = ({
                 </span>
               )}
             </div>
-            {isSelected && type === "MODEL" && (
+            {/* {isSelected && type === "MODEL" && (
               <span className="block text-xs text-[#787878]">
                 (MEDIUM END FINISH)
               </span>
-            )}
+            )} */}
           </motion.div>
         );
       })}

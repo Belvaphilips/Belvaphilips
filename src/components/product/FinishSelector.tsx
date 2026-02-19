@@ -16,13 +16,13 @@ const finishes = [
       "Clean, white-background images perfect for eCommerce and social media.",
     price: "₦25,000/image",
   },
-  {
-    id: "medium",
-    title: "MEDIUM END FINISH",
-    description:
-      "Styled product shots with colorful backdrops for a polished look.",
-    price: "₦45,000/image",
-  },
+  // {
+  //   id: "medium",
+  //   title: "MEDIUM END FINISH",
+  //   description:
+  //     "Styled product shots with colorful backdrops for a polished look.",
+  //   price: "₦45,000/image",
+  // },
   {
     id: "high",
     title: "HIGH END FINISH",
