@@ -154,7 +154,7 @@ export default function FixedPricingSection() {
                   transition={{ duration: 0.2 }}
                   onClick={() => setIsModalOpen(true)}
                 >
-                  <span className="text-[#ACACAC] text-[126.44px] text-left w-full font-semibold leading-[115%] tracking-[-4.58px]">
+                  <span className="text-[#ACACAC] xl:text-[126.44px] text-[110px] text-left w-full font-semibold leading-[115%] tracking-[-4.58px]">
                     GET STARTED
                   </span>
                   <div className="-mt-5">

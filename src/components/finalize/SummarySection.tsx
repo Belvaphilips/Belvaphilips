@@ -1,11 +1,13 @@
 interface SummarySectionProps {
   productType: string;
   shotCount: number;
+  onUpgrade: () => void;
 }
 
 export default function SummarySection({
   productType,
   shotCount,
+  onUpgrade,
 }: SummarySectionProps) {
   return (
     <div>
@@ -38,7 +40,10 @@ export default function SummarySection({
           <span className="font-semibold text-[#1D1D1B] text-sm md:text-base">
             Upgrade your membership in order to save up to 25%!
           </span>
-          <button className="bg-black text-white md:h-[38px] h-[32px] md:w-[106px] px-3 md:px-0 flex items-center justify-center text-sm font-semibold uppercase rounded-full">
+          <button
+            onClick={onUpgrade}
+            className="bg-black cursor-pointer text-white md:h-[38px] h-[32px] md:w-[106px] px-3 md:px-0 flex items-center justify-center text-sm font-semibold uppercase rounded-full"
+          >
             Upgrade
           </button>
         </div>

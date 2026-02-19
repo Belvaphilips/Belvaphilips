@@ -11,12 +11,13 @@ import SummarySection from "@/components/finalize/SummarySection";
 import { GoArrowRight } from "react-icons/go";
 import Spinner from "@/components/ui/Spinner";
 import { useRouter } from "next/navigation";
+import MembershipModal from "../product/MembershipModal";
 
 export default function FinalizeContent() {
   const searchParams = useSearchParams();
   const initialProductId = searchParams.get("id");
   const router = useRouter();
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProducts, setSelectedProducts] = useState<
     (typeof portfolios)[0][]
   >([]);
@@ -173,10 +174,12 @@ export default function FinalizeContent() {
             <SummarySection
               productType={getProductType()}
               shotCount={selectedProducts.length}
+              onUpgrade={() => setIsModalOpen(true)}
             />
           </div>
         </div>
       </div>
+      <MembershipModal open={isModalOpen} onOpenChange={setIsModalOpen} />
     </div>
   );
 }
