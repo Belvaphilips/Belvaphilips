@@ -83,7 +83,6 @@ export default function NewsletterModal() {
         </DialogTitle>
 
         {status === "success" ? (
-          // ── Success State ──
           <div className="flex flex-col items-center justify-center py-12 sm:py-16 px-6 sm:px-10 bg-white text-center gap-4 sm:gap-5">
             <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-black flex items-center justify-center">
               <svg
