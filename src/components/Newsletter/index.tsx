@@ -111,8 +111,8 @@ export default function NewsletterModal() {
             </p>
           </div>
         ) : (
-          <div className="bg-white sm:p-7 p-4">
-            <div className="relative w-full h-[180px] sm:h-[260px] bg-gray-100">
+          <div className="bg-white sm:px-7 pt-0 p-4">
+            {/* <div className="relative w-full h-[180px] sm:h-[260px] bg-gray-100">
               <Image
                 src="/assets/newsletter-image.png"
                 alt="Belvaphilips product photography preview"
@@ -120,7 +120,7 @@ export default function NewsletterModal() {
                 className="object-cover"
                 priority
               />
-            </div>
+            </div> */}
 
             <div className="pt-8">
               <h2 className="text-[18px] sm:text-[24px] font-semibold uppercase mb-2 leading-tight">
