@@ -7,6 +7,7 @@ import AuthProvider from "@/lib/supabase/AuthProvider";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import ScrollTop from "@/components/ScrollToTop";
+import NewsletterModal from "@/components/Newsletter";
 
 export default function RootLayoutClient({
   children,
@@ -20,6 +21,7 @@ export default function RootLayoutClient({
       <Provider store={store}>
         <AuthProvider>
           <Header />
+          <NewsletterModal />
           <main>{children}</main>
         </AuthProvider>
       </Provider>
