@@ -67,7 +67,7 @@ export default function NewsletterModal() {
 
   return (
     <Dialog
-      open={!open}
+      open={open}
       onOpenChange={(val) => {
         if (!val) handleClose();
       }}
