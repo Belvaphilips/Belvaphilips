@@ -18,7 +18,7 @@ export default function NewsletterModal() {
   useEffect(() => {
     const dismissed = localStorage.getItem(STORAGE_KEY);
     if (!dismissed) {
-      const timer = setTimeout(() => setOpen(true), 800);
+      const timer = setTimeout(() => setOpen(true), 60000);
       return () => clearTimeout(timer);
     }
   }, []);
