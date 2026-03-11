@@ -6,6 +6,8 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 
 const STORAGE_KEY = "belvaphilips_newsletter_dismissed";
 
+const RESHOW_DELAY = 5 * 60 * 1000; // 5 minutes after dismissal
+
 export default function NewsletterModal() {
   const [open, setOpen] = useState(false);
   const [fullName, setFullName] = useState("");
@@ -16,8 +18,8 @@ export default function NewsletterModal() {
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    const dismissed = localStorage.getItem(STORAGE_KEY);
-    if (!dismissed) {
+    const subscribed = localStorage.getItem(STORAGE_KEY);
+    if (!subscribed) {
       const timer = setTimeout(() => setOpen(true), 60000);
       return () => clearTimeout(timer);
     }
@@ -25,7 +27,11 @@ export default function NewsletterModal() {
 
   const handleClose = () => {
     setOpen(false);
-    localStorage.setItem(STORAGE_KEY, "true");
+    // Re-show after RESHOW_DELAY if the user hasn't subscribed
+    setTimeout(() => {
+      const subscribed = localStorage.getItem(STORAGE_KEY);
+      if (!subscribed) setOpen(true);
+    }, RESHOW_DELAY);
   };
 
   const handleSubmit = async () => {
@@ -50,7 +56,8 @@ export default function NewsletterModal() {
       if (response.ok || response.status === 204) {
         setStatus("success");
         setTimeout(() => {
-          handleClose();
+          localStorage.setItem(STORAGE_KEY, "true");
+          setOpen(false);
           setStatus("idle");
         }, 3000);
       } else {
