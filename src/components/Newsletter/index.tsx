@@ -20,7 +20,7 @@ export default function NewsletterModal() {
   useEffect(() => {
     const subscribed = localStorage.getItem(STORAGE_KEY);
     if (!subscribed) {
-      const timer = setTimeout(() => setOpen(true), 60000);
+      const timer = setTimeout(() => setOpen(true), 20000);
       return () => clearTimeout(timer);
     }
   }, []);
