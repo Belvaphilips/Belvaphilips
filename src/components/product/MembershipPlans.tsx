@@ -8,7 +8,7 @@ const plans = [
     id: "pay-as-you-go",
     title: "PAY AS YOU GO",
     description: "No commitment. Best suited for small or one-time orders.",
-    price: "₦65,000/image",
+    price: "₦75,000/image",
     savings: "",
   },
   {

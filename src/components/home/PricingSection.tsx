@@ -9,7 +9,7 @@ import { ArrowUpRight } from "lucide-react";
 const pricingOptions = [
   {
     title: "Basic End Finish",
-    description: "From ₦25,000/image",
+    description: "From ₦35,000/image",
     image: "/assets/pricing/basic.png",
   },
   // {
@@ -19,7 +19,7 @@ const pricingOptions = [
   // },
   {
     title: "High End Finish",
-    description: "From ₦65,000/image",
+    description: "From ₦75,000/image",
     image: "/assets/pricing/high-2.jpg",
   },
   {

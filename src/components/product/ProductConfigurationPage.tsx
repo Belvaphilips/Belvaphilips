@@ -36,7 +36,7 @@ const ProductConfigurationPage = ({
   const [selectedFinish, setSelectedFinish] = useState("BASIC END FINISH");
   const [selectedShootType, setSelectedShootType] = useState(shootType);
   const [quantity, setQuantity] = useState(1);
-  const [basePrice, setBasePrice] = useState(25000);
+  const [basePrice, setBasePrice] = useState(35000);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [selectedMembershipPlan, setSelectedMembershipPlan] = useState<
     string | null
@@ -79,19 +79,19 @@ const ProductConfigurationPage = ({
     } else {
       switch (selectedFinish) {
         case "BASIC END FINISH":
-          setBasePrice(25000);
+          setBasePrice(35000);
           break;
         case "MEDIUM END FINISH":
           setBasePrice(45000);
           break;
         case "HIGH END FINISH":
-          setBasePrice(65000);
+          setBasePrice(75000);
           break;
         case "PREMIUM END FINISH":
           setBasePrice(150000);
           break;
         default:
-          setBasePrice(25000);
+          setBasePrice(35000);
       }
     }
   }, [selectedFinish, selectedShootType, videoConfig.animationPackage]);

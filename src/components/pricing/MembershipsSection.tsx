@@ -60,7 +60,7 @@ export default function MembershipsSection() {
             minimumOrder="5 minimum order"
             turnaround="7 business days"
             onGetStarted={() => handleGetStarted("PAY AS YOU GO", "")}
-            startingPrice="₦65,000/image"
+            startingPrice="₦75,000/image"
             noHeader={true}
           />
         </div>

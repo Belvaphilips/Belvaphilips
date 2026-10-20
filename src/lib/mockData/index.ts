@@ -3,14 +3,14 @@ export const portfolioItems = [
     id: 143,
     title: "Bag",
     tags: ["Catalogue", "Static"],
-    price: "₦25,000/image",
+    price: "₦35,000/image",
     image: "/assets/portfolio/bags/1.jpg",
   },
   {
     id: 24,
     title: "Beauty",
     tags: ["Dynamic", "Motion"],
-    price: "₦65,000/image",
+    price: "₦75,000/image",
     image: "/assets/portfolio/shoes/shoe1.jpg",
   },
   {
