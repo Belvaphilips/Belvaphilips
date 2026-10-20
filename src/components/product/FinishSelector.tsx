@@ -14,7 +14,7 @@ const finishes = [
     title: "BASIC END FINISH",
     description:
       "Clean, white-background images perfect for eCommerce and social media.",
-    price: "₦25,000/image",
+    price: "₦35,000/image",
   },
   // {
   //   id: "medium",
@@ -28,7 +28,7 @@ const finishes = [
     title: "HIGH END FINISH",
     description:
       "High-quality visuals ideal for campaigns, branding, and product launches.",
-    price: "₦65,000/image",
+    price: "₦75,000/image",
   },
   {
     id: "premium",
